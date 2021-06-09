@@ -6,7 +6,7 @@ const VideoSchema = new mongoose.Schema({
     type: String,
     required: "Can't add without video id"
   },
-  thumbnailUrl: {
+  thumbnailURL: {
     type: String,
     required: "Can't add without thumbnailURL"
   },
@@ -26,7 +26,7 @@ const VideoSchema = new mongoose.Schema({
     required: "Can't add without channel name"
   },
   channelImageURL: {
-    type: mongoose.SchemaTypes.URL,
+    type: mongoose.SchemaTypes.Url,
     required: true
   },
   publishedDate: {

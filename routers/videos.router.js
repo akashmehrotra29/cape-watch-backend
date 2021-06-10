@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { getVideos, getVideoById } = require('../controllers/videos.controller');
+const { getVideos, findVideoById, getVideoById } = require('../controllers/videos.controller');
 
 router
   .route("/")
   .get(getVideos);
+
+router.param("videoId", findVideoById);
 
 router
   .route("/:videoId")

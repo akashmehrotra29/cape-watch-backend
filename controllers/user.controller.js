@@ -1,5 +1,6 @@
 const { User } = require('../models/user.model');
 const { Playlist } = require('../models/playlist.model');
+const bcrypt = require('bcrypt');
 
 const findUser = async (req, res) => {
   try { 
@@ -7,7 +8,7 @@ const findUser = async (req, res) => {
     const user = await User.findOne({ email: email });
 
     if (user) {
-      user.password === password ? res.json({ success: true, user, message: "Successfully logged in" }) : res.json({ success: false, user: null, message: "Incorrect password. Please try again" }); 
+      bcrypt.compareSync(password, user.password) ? res.json({ success: true, user, message: "Successfully logged in" }) : res.json({ success: false, user: null, message: "Incorrect password. Please try again" }); 
     }
     res.json({ success: false, user: null, message: "The account does not exist. Please signup" });
   } catch(error) {
@@ -33,9 +34,10 @@ const registerUser = async (req, res) => {
     const user = await User.findOne({ email: email });
     
     if (user) {
-      res.json({ success: false, message: "Account with this email already exist. Typ to login" });
+      res.json({ success: false, message: "Account with this email already exist. Try to login" });
     } else {
-      const newUser = new User({ name, email, password });
+      let newUser = new User({ name, email, password });
+      newUser.password = bcrypt.hashSync(newUser.password, 10);
       const savedUser = await newUser.save();
 
       defaultPlaylists.forEach(async playlist => {

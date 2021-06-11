@@ -1,6 +1,7 @@
 const { User } = require('../models/user.model');
 const { Playlist } = require('../models/playlist.model');
 const bcrypt = require('bcrypt');
+const { extend } = require('lodash');
 
 const findUser = async (req, res) => {
   try { 
@@ -52,4 +53,34 @@ const registerUser = async (req, res) => {
   } 
 }
 
-module.exports = { findUser, registerUser };
+const updateUser = async (req, res) => {
+  try {
+    const updatedUser = req.body;
+    let user = await User.findById(updatedUser.id);
+
+    const isEmailPresent = await User.findOne({ email: updatedUser.email })
+    if (isEmailPresent) {
+      return res.json({ success: false, message: "User with same email already exist" });
+    }
+    
+    // user = extend(user, updatedUser);
+    // user.updatedAt = Date();
+    // user = await user.save();
+    
+    if(user.id === updatedUser.id) {
+      Object.keys(updatedUser).forEach((key) => {
+        if(key in user) {
+          user[key] = updatedUser[key];
+        }
+      });
+      user["updatedAt"] = Date();
+    }
+    
+    user.password = undefined;
+    res.json({ success: true, user, message: "User credentials updated successfully" })
+  } catch(error) {
+    res.json({ success: false, message: "Can't update user. Something went wrong."})
+  }
+}
+
+module.exports = { findUser, registerUser, updateUser };

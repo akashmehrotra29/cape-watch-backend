@@ -4,7 +4,7 @@ const createNewPlaylist = async (req, res) => {
   try {
     const newPlaylist = new Playlist (req.body);
     await newPlaylist.save();
-    // console.log("newPlaylist", newPlaylist);
+
     res.json({ success: true, playlist: newPlaylist, message: "New playlist created sucessfully" });
   } catch(error) {
     res.json({ success: false, message: "Failed to create new playlist" })

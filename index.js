@@ -12,13 +12,17 @@ app.use(cors())
 initializeDBConnection();
 // seedVideos();
 
+const userRouter = require('./routers/user.router')
 const videosRouter = require('./routers/videos.router')
+const playlistsRouter = require('./routers/playlists.router')
 
 app.get('/', (req, res) => {
   res.send('Welcome to capewatch')
 });
 
-app.use("/videos", videosRouter)
+app.use("/users", userRouter);
+app.use("/videos", videosRouter);
+app.use("/playlists", playlistsRouter);
 
 app.listen(3000, () => {
   console.log('server started');

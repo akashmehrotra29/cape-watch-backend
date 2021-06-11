@@ -9,7 +9,7 @@ const getVideos = async (req, res) => {
   }
 }
 
-const findVideoById = async(req, res, next, videoId) => {
+const findVideoById = async (req, res, next, videoId) => {
   try {
     const video = await Video.findOne({ _id: videoId });
     if(!video) {

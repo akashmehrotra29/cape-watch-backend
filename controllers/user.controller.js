@@ -73,8 +73,10 @@ const updateUser = async (req, res) => {
           user[key] = updatedUser[key];
         }
       });
+      user["password"] = bcrypt.hashSync(updatedUser.password, 10);
       user["updatedAt"] = Date();
     }
+    await user.save();
     
     user.password = undefined;
     res.json({ success: true, user, message: "User credentials updated successfully" })

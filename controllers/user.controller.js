@@ -2,6 +2,7 @@ const { User } = require('../models/user.model');
 const { Playlist } = require('../models/playlist.model');
 const bcrypt = require('bcrypt');
 const { extend } = require('lodash');
+const jwt = require('jsonwebtoken');
 
 const findUser = async (req, res) => {
   try { 
@@ -9,11 +10,18 @@ const findUser = async (req, res) => {
     const user = await User.findOne({ email: email });
 
     if (user) {
-      bcrypt.compareSync(password, user.password) ? res.json({ success: true, user, message: "Successfully logged in" }) : res.json({ success: false, user: null, message: "Incorrect password. Please try again" }); 
+      if (bcrypt.compareSync(password, user.password)) {
+        const token = jwt.sign({ _id: user._id, name: user.name }, process.env['JWT_SECRET'], { expiresIn: "24h" });
+        
+        res.json({ success: true, token , message: "Successfully logged in" })
+      } else {
+        res.json({ success: false, token: null, message: "Incorrect password. Please try again" });
+      }  
     }
-    res.json({ success: false, user: null, message: "The account does not exist. Please signup" });
+
+    res.json({ success: false, token: null, message: "The account does not exist. Please signup" });
   } catch(error) {
-    res.json({ success: false, user: null, message: "Can't login. Something went wrong" });
+    res.json({ success: false, token: null, message: "Can't login. Something went wrong" });
   }
 }
 
@@ -38,6 +46,7 @@ const registerUser = async (req, res) => {
       res.json({ success: false, message: "Account with this email already exist. Try to login" });
     } else {
       let newUser = new User({ name, email, password });
+      //add unique email validation
       newUser.password = bcrypt.hashSync(newUser.password, 10);
       const savedUser = await newUser.save();
 

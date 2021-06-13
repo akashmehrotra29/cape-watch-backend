@@ -10,7 +10,7 @@ const findUser = async (req, res) => {
     const user = await User.findOne({ email: email });
 
     if (user) {
-      if (bcrypt.compareSync(password, user.password)) {
+      if (bcrypt.compareSync(password, user.password)) { // add salt
         const token = jwt.sign({ _id: user._id, name: user.name }, process.env['JWT_SECRET'], { expiresIn: "24h" });
         
         res.json({ success: true, token , message: "Successfully logged in" })
@@ -46,8 +46,8 @@ const registerUser = async (req, res) => {
       res.json({ success: false, message: "Account with this email already exist. Try to login" });
     } else {
       let newUser = new User({ name, email, password });
-      //add unique email validation
-      newUser.password = bcrypt.hashSync(newUser.password, 10);
+      
+      newUser.password = bcrypt.hashSync(newUser.password, 10); //add salt
       const savedUser = await newUser.save();
 
       defaultPlaylists.forEach(async playlist => {
@@ -57,7 +57,8 @@ const registerUser = async (req, res) => {
 
       res.json({ success: true, user: savedUser, message: "Signed up Successfully" });
     }
-  } catch {
+  }
+   catch {
     res.json({ user: null, success: false, message: "Can't signup. Something went wrong" });
   } 
 }
@@ -82,7 +83,7 @@ const updateUser = async (req, res) => {
           user[key] = updatedUser[key];
         }
       });
-      user["password"] = bcrypt.hashSync(updatedUser.password, 10);
+      user["password"] = bcrypt.hashSync(updatedUser.password, 10); // add salt
       user["updatedAt"] = Date();
     }
     await user.save();

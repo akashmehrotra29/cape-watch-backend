@@ -15,7 +15,9 @@ initializeDBConnection();
 const userRouter = require('./routers/user.router')
 const videosRouter = require('./routers/videos.router')
 const playlistsRouter = require('./routers/playlists.router')
-const authenticate = require('./middlewares/authenticate')
+const authenticationHandler = require('./middlewares/authenticationHandler.middleware')
+const routeHandler = require('./middlewares/routeHandler.middleware')
+const errorHandler = require('./middlewares/errorHandler.middleware')
 
 app.get('/', (req, res) => {
   res.send('Welcome to capewatch')
@@ -23,7 +25,10 @@ app.get('/', (req, res) => {
 
 app.use("/users", userRouter);
 app.use("/videos", videosRouter);
-app.use("/playlists", authenticate, playlistsRouter);
+app.use("/playlists", authenticationHandler, playlistsRouter);
+
+app.use(routeHandler);
+app.use(errorHandler);
 
 app.listen(3000, () => {
   console.log('server started');

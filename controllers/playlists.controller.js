@@ -36,6 +36,7 @@ const getPlaylistById = async (req, res) => {
 const updatePlaylist = async (req, res) => {
   const { playlistId } = req.params;
   const { videoId } = req.body;
+
   try {
     const playlist = await Playlist.findOne({ _id: playlistId });
     const isVideoInPlaylist = playlist.videos.includes(videoId);
@@ -60,6 +61,17 @@ const removePlaylistById = async (req, res) => {
   }
 }
 
+const removePlaylistVideosById = async (req, res) => {
+  try{
+    const { playlistId } = req.params;
+    await Playlist.findOneAndUpdate({ _id: playlistId }, { videos: [] });
+
+    res.json({ success: true, message: "Playlist videos removed successfully"})
+  } catch(error){
+    res.json({ success: false, message: "Failed to remove playlist videos"})
+  }
+}
+
 const updatePlaylistName = async (req, res) => {
   try {
     const { playlistId } = req.params;
@@ -72,4 +84,4 @@ const updatePlaylistName = async (req, res) => {
   }
 }
 
-module.exports = { createNewPlaylist, getUserPlaylists, getPlaylistById, updatePlaylist, removePlaylistById, updatePlaylistName };
+module.exports = { createNewPlaylist, getUserPlaylists, getPlaylistById, updatePlaylist, removePlaylistById, removePlaylistVideosById, updatePlaylistName };

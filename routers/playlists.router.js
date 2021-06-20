@@ -6,6 +6,7 @@ const {
   getPlaylistById, 
   updatePlaylist, 
   removePlaylistById,
+  removePlaylistVideosById,
   updatePlaylistName 
   } = require('../controllers/playlists.controller');
 
@@ -22,6 +23,10 @@ router
   .get(getPlaylistById)
   .post(updatePlaylist)
   .delete(removePlaylistById);
+
+router
+  .route("/remove/:playlistId")
+  .post(removePlaylistVideosById)
 
 router
   .route("/update/:playlistId")

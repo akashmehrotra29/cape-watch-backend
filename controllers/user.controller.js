@@ -11,8 +11,8 @@ const findUser = async (req, res) => {
 
     if (user) {
       if (bcrypt.compareSync(password, user.password)) { 
-        const token = jwt.sign({ _id: user._id, name: user.name }, process.env['JWT_SECRET'], { expiresIn: "24h" });
-        
+        const token = jwt.sign({ _id: user._id, name: user.name, email: user.email }, process.env['JWT_SECRET'], { expiresIn: "24h" });
+
         res.json({ success: true, token , message: "Successfully logged in" })
       } else {
         res.json({ success: false, token: null, message: "Incorrect password. Please try again" });
@@ -50,12 +50,14 @@ const registerUser = async (req, res) => {
       newUser.password = bcrypt.hashSync(newUser.password, 10);
       const savedUser = await newUser.save();
 
+      const token = jwt.sign({ _id: savedUser._id, name: savedUser.name, email: savedUser.email }, process.env['JWT_SECRET'], { expiresIn: "24h" });
+
       defaultPlaylists.forEach(async playlist => {
         const newPlaylist = new Playlist({ user: savedUser._id, name: playlist.name, videos: [] });
         await newPlaylist.save();
       })
 
-      res.json({ success: true, user: savedUser, message: "Signed up Successfully" });
+      res.json({ success: true, token, message: "Signed up Successfully" });
     }
   }
    catch {
@@ -72,10 +74,6 @@ const updateUser = async (req, res) => {
     if (isEmailPresent) {
       return res.json({ success: false, message: "User with same email already exist" });
     }
-    
-    // user = extend(user, updatedUser);
-    // user.updatedAt = Date();
-    // user = await user.save();
     
     if(user.id === updatedUser.id) {
       Object.keys(updatedUser).forEach((key) => {

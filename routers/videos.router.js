@@ -12,6 +12,4 @@ router
   .route("/:videoId")
   .get(getVideoById);
 
-
-
 module.exports = router;
